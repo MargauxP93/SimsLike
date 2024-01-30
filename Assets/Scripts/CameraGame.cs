@@ -108,4 +108,8 @@ public class CameraGame : MonoBehaviour
         _angle %= 360;
         return _angle;
     }
+    public Ray GetRayFromCursor(Cursor _cursor)
+    {
+        return sensorCamera.ScreenPointToRay(_cursor.CursorLocation);
+    }
 }

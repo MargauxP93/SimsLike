@@ -39,17 +39,6 @@ public partial class @Controls: IInputActionCollection2, IDisposable
             ],
             ""bindings"": [
                 {
-                    ""name"": """",
-                    ""id"": ""e368fdd4-b800-4911-8d8a-38b1cd1654e6"",
-                    ""path"": ""<Mouse>/delta/x"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Rotate"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
                     ""name"": ""1D Axis"",
                     ""id"": ""f07ae228-e1d9-415c-8d1c-b4d928928b29"",
                     ""path"": ""1DAxis"",
@@ -83,6 +72,96 @@ public partial class @Controls: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": true
                 }
             ]
+        },
+        {
+            ""name"": ""SimsCursor"",
+            ""id"": ""5076dcce-166c-4019-bdf4-61574568eef8"",
+            ""actions"": [
+                {
+                    ""name"": ""MousePosition"",
+                    ""type"": ""Value"",
+                    ""id"": ""4af62691-40ff-4791-b72d-ce261bf42263"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Select"",
+                    ""type"": ""Button"",
+                    ""id"": ""6c1a7069-cf16-4f3d-85a1-5c0f7e996def"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Rotate"",
+                    ""type"": ""Value"",
+                    ""id"": ""21ebaea8-be0b-483c-8926-233d1e26d880"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""cefd1e73-8d31-4c2b-8cef-8bfa332911f7"",
+                    ""path"": ""<Mouse>/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MousePosition"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4a489783-22b7-466f-9449-05d55015e588"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Select"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""1D Axis"",
+                    ""id"": ""2e8dd504-ecb9-4cdd-85c0-8c6662274331"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Rotate"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""df4f5c2f-1588-4d09-a7f3-96ac5d579656"",
+                    ""path"": ""<Keyboard>/#(A)"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Rotate"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""730ce2e9-f0a7-4af3-9040-d75010021147"",
+                    ""path"": ""<Keyboard>/#(E)"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Rotate"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -90,6 +169,11 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         // SimsCamera
         m_SimsCamera = asset.FindActionMap("SimsCamera", throwIfNotFound: true);
         m_SimsCamera_Rotate = m_SimsCamera.FindAction("Rotate", throwIfNotFound: true);
+        // SimsCursor
+        m_SimsCursor = asset.FindActionMap("SimsCursor", throwIfNotFound: true);
+        m_SimsCursor_MousePosition = m_SimsCursor.FindAction("MousePosition", throwIfNotFound: true);
+        m_SimsCursor_Select = m_SimsCursor.FindAction("Select", throwIfNotFound: true);
+        m_SimsCursor_Rotate = m_SimsCursor.FindAction("Rotate", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -193,8 +277,76 @@ public partial class @Controls: IInputActionCollection2, IDisposable
         }
     }
     public SimsCameraActions @SimsCamera => new SimsCameraActions(this);
+
+    // SimsCursor
+    private readonly InputActionMap m_SimsCursor;
+    private List<ISimsCursorActions> m_SimsCursorActionsCallbackInterfaces = new List<ISimsCursorActions>();
+    private readonly InputAction m_SimsCursor_MousePosition;
+    private readonly InputAction m_SimsCursor_Select;
+    private readonly InputAction m_SimsCursor_Rotate;
+    public struct SimsCursorActions
+    {
+        private @Controls m_Wrapper;
+        public SimsCursorActions(@Controls wrapper) { m_Wrapper = wrapper; }
+        public InputAction @MousePosition => m_Wrapper.m_SimsCursor_MousePosition;
+        public InputAction @Select => m_Wrapper.m_SimsCursor_Select;
+        public InputAction @Rotate => m_Wrapper.m_SimsCursor_Rotate;
+        public InputActionMap Get() { return m_Wrapper.m_SimsCursor; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(SimsCursorActions set) { return set.Get(); }
+        public void AddCallbacks(ISimsCursorActions instance)
+        {
+            if (instance == null || m_Wrapper.m_SimsCursorActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_SimsCursorActionsCallbackInterfaces.Add(instance);
+            @MousePosition.started += instance.OnMousePosition;
+            @MousePosition.performed += instance.OnMousePosition;
+            @MousePosition.canceled += instance.OnMousePosition;
+            @Select.started += instance.OnSelect;
+            @Select.performed += instance.OnSelect;
+            @Select.canceled += instance.OnSelect;
+            @Rotate.started += instance.OnRotate;
+            @Rotate.performed += instance.OnRotate;
+            @Rotate.canceled += instance.OnRotate;
+        }
+
+        private void UnregisterCallbacks(ISimsCursorActions instance)
+        {
+            @MousePosition.started -= instance.OnMousePosition;
+            @MousePosition.performed -= instance.OnMousePosition;
+            @MousePosition.canceled -= instance.OnMousePosition;
+            @Select.started -= instance.OnSelect;
+            @Select.performed -= instance.OnSelect;
+            @Select.canceled -= instance.OnSelect;
+            @Rotate.started -= instance.OnRotate;
+            @Rotate.performed -= instance.OnRotate;
+            @Rotate.canceled -= instance.OnRotate;
+        }
+
+        public void RemoveCallbacks(ISimsCursorActions instance)
+        {
+            if (m_Wrapper.m_SimsCursorActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(ISimsCursorActions instance)
+        {
+            foreach (var item in m_Wrapper.m_SimsCursorActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_SimsCursorActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public SimsCursorActions @SimsCursor => new SimsCursorActions(this);
     public interface ISimsCameraActions
     {
+        void OnRotate(InputAction.CallbackContext context);
+    }
+    public interface ISimsCursorActions
+    {
+        void OnMousePosition(InputAction.CallbackContext context);
+        void OnSelect(InputAction.CallbackContext context);
         void OnRotate(InputAction.CallbackContext context);
     }
 }
